@@ -412,7 +412,7 @@ export default {
         }
 
         const successMessage = await getVerificationSuccessMessage();
-        await sendMessageToUser(chatId, `${successMessage}\n你好，欢迎使用私聊机器人，现在发送信息吧！`);
+        await sendMessageToUser(chatId, `${successMessage}\n你好喵，和我说悄悄话叭~我不会告诉被人的欧๑>ᴗO๑`);
         const userInfo = await getUserInfo(chatId);
         await ensureUserTopic(chatId, userInfo);
         return;
@@ -586,12 +586,12 @@ export default {
 
     async function getVerificationSuccessMessage() {
       const userRawEnabled = (await getSetting('user_raw_enabled', env.D1)) === 'true';
-      if (!userRawEnabled) return '你通过我的小考验啦！可以给我发送悄悄话咯~Meow';
+      if (!userRawEnabled) return '你通过我的小考验啦！可以给我发送悄悄话咯 ๑>ᴗO๑';
 
       const response = await fetch('你好鸭~这里是Nvdaの传讯小人Meow~');
-      if (!response.ok) return '你通过我的小考验啦！可以给我发送悄悄话咯~Meow';
+      if (!response.ok) return '你通过我的小考验啦！可以给我发送悄悄话咯 ๑>ᴗO๑';
       const message = await response.text();
-      return message.trim() || '你通过我的小考验啦！可以给我发送悄悄话咯~Meow';
+      return message.trim() || '你通过我的小考验啦！可以给我发送悄悄话咯 ๑>ᴗO๑';
     }
 
     async function getNotificationContent() {
