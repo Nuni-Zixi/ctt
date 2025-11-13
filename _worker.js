@@ -315,7 +315,7 @@ export default {
       }
 
       if (userState.is_blocked) {
-        await sendMessageToUser(chatId, "您已被拉黑，无法发送消息。请联系管理员解除拉黑。");
+        await sendMessageToUser(chatId, "你被关小黑屋啦！不要挣扎啦~可以问问Nvda欧~Zako~");
         return;
       }
 
@@ -342,7 +342,7 @@ export default {
             
             if (isCodeExpired) {
               // 如果验证码已过期，重新发送验证码
-              await sendMessageToUser(chatId, '验证码已过期，正在为您发送新的验证码...');
+              await sendMessageToUser(chatId, '欧哦！验证码过期啦，我再找找新的验证码哦...');
               await env.D1.prepare('UPDATE user_states SET verification_code = NULL, code_expiry = NULL, is_verifying = FALSE WHERE chat_id = ?')
                 .bind(chatId)
                 .run();
@@ -389,17 +389,17 @@ export default {
                     await handleVerification(chatId, 0);
                   } catch (retryError) {
                     console.error(`重试发送验证码仍失败: ${retryError.message}`);
-                    await sendMessageToUser(chatId, '发送验证码失败，请发送任意消息重试');
+                    await sendMessageToUser(chatId, '欧哦！验证码发送失败了耶，发送任意消息再试试欧~');
                   }
                 }, 1000);
               }
               return;
             } else {
-              await sendMessageToUser(chatId, `请完成验证后发送消息"${text || '您的具体信息'}"。`);
+              await sendMessageToUser(chatId, `通过小考验后发送"${text || '您的具体信息'}"`);
             }
             return;
           }
-          await sendMessageToUser(chatId, `请完成验证后发送消息"${text || '您的具体信息'}"。`);
+          await sendMessageToUser(chatId, `通过小考验后发送"${text || '您的具体信息'}"`);
           await handleVerification(chatId, messageId);
           return;
         }
@@ -407,7 +407,7 @@ export default {
 
       if (text === '/start') {
         if (await checkStartCommandRate(chatId)) {
-          await sendMessageToUser(chatId, "您发送 /start 命令过于频繁，请稍后再试！");
+          await sendMessageToUser(chatId, "不要一直发 /start 啦~笨蛋！");
           return;
         }
 
@@ -420,13 +420,13 @@ export default {
 
       const userInfo = await getUserInfo(chatId);
       if (!userInfo) {
-        await sendMessageToUser(chatId, "无法获取用户信息，请稍后再试或联系管理员。");
+        await sendMessageToUser(chatId, "你是谁呀~我不认识耶，要不再试试捏或者问问Nvda~Zako~");
         return;
       }
 
       let topicId = await ensureUserTopic(chatId, userInfo);
       if (!topicId) {
-        await sendMessageToUser(chatId, "无法创建话题，请稍后再试或联系管理员。");
+        await sendMessageToUser(chatId, "不能创建悄悄话小屋耶，问问Nvda欧~Meow");
         return;
       }
 
@@ -436,7 +436,7 @@ export default {
         topicIdCache.set(chatId, undefined);
         topicId = await ensureUserTopic(chatId, userInfo);
         if (!topicId) {
-          await sendMessageToUser(chatId, "无法重新创建话题，请稍后再试或联系管理员。");
+          await sendMessageToUser(chatId, "不能再次创建悄悄话小屋耶，问问Nvda欧~Meow");
           return;
         }
       }
@@ -518,7 +518,7 @@ export default {
       const senderId = chatId;
       const isAdmin = await checkIfAdmin(senderId);
       if (!isAdmin) {
-        await sendMessageToTopic(topicId, '只有管理员可以使用此功能。');
+        await sendMessageToTopic(topicId, '只有管理员可以使用此功能哦~Meow！');
         return;
       }
 
@@ -537,7 +537,7 @@ export default {
       userStateCache.set(targetChatId, undefined);
       messageRateCache.set(targetChatId, undefined);
       topicIdCache.set(targetChatId, undefined);
-      await sendMessageToTopic(topicId, `用户 ${targetChatId} 的状态已重置。`);
+      await sendMessageToTopic(topicId, ` ${targetChatId} 的状态已经恢复原样啦~`);
     }
 
     async function sendAdminPanel(chatId, topicId, privateChatId, messageId) {
@@ -546,7 +546,7 @@ export default {
 
       const buttons = [
         [
-          { text: '拉黑用户', callback_data: `block_${privateChatId}` },
+          { text: '拉黑笨蛋', callback_data: `block_${privateChatId}` },
           { text: '解除拉黑', callback_data: `unblock_${privateChatId}` }
         ],
         [
@@ -555,14 +555,13 @@ export default {
         ],
         [
           { text: userRawEnabled ? '关闭用户Raw' : '开启用户Raw', callback_data: `toggle_user_raw_${privateChatId}` },
-          { text: 'GitHub项目', url: 'https://github.com/iawooo/ctt' }
         ],
         [
-          { text: '删除用户', callback_data: `delete_user_${privateChatId}` }
+          { text: '删除笨蛋', callback_data: `delete_user_${privateChatId}` }
         ]
       ];
 
-      const adminMessage = '管理员面板：请选择操作';
+      const adminMessage = 'Admin Panel：';
       await Promise.all([
         fetchWithRetry(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           method: 'POST',
@@ -587,12 +586,12 @@ export default {
 
     async function getVerificationSuccessMessage() {
       const userRawEnabled = (await getSetting('user_raw_enabled', env.D1)) === 'true';
-      if (!userRawEnabled) return '验证成功！您现在可以与我聊天。';
+      if (!userRawEnabled) return '你通过我的小考验啦！可以给我发送悄悄话咯~Meow';
 
-      const response = await fetch('https://raw.githubusercontent.com/iawooo/ctt/refs/heads/main/CFTeleTrans/start.md');
-      if (!response.ok) return '验证成功！您现在可以与我聊天。';
+      const response = await fetch('你好鸭~这里是Nvdaの传讯小人Meow~');
+      if (!response.ok) return '你通过我的小考验啦！可以给我发送悄悄话咯~Meow';
       const message = await response.text();
-      return message.trim() || '验证成功！您现在可以与我聊天。';
+      return message.trim() || '你通过我的小考验啦！可以给我发送悄悄话咯~Meow';
     }
 
     async function getNotificationContent() {
@@ -760,7 +759,7 @@ export default {
         const nowSeconds = Math.floor(Date.now() / 1000);
 
         if (!storedCode || (codeExpiry && nowSeconds > codeExpiry)) {
-          await sendMessageToUser(chatId, '验证码已过期，正在为您发送新的验证码...');
+          await sendMessageToUser(chatId, '欧哦~验证码过期啦！正在发送新的验证码哦...');
           await env.D1.prepare('UPDATE user_states SET verification_code = NULL, code_expiry = NULL, is_verifying = FALSE WHERE chat_id = ?')
             .bind(chatId)
             .run();
@@ -820,11 +819,11 @@ export default {
             .run();
 
           const successMessage = await getVerificationSuccessMessage();
-          await sendMessageToUser(chatId, `${successMessage}\n你好，欢迎使用私聊机器人！现在可以发送消息了。`);
+          await sendMessageToUser(chatId, `${successMessage}\n你好欧，通过我的小考验啦！现在可以给我发送悄悄话咯`);
           const userInfo = await getUserInfo(chatId);
           await ensureUserTopic(chatId, userInfo);
         } else {
-          await sendMessageToUser(chatId, '验证失败，请重新尝试。');
+          await sendMessageToUser(chatId, '欧哦！失败啦~再试试呢');
           await handleVerification(chatId, messageId);
         }
 
@@ -840,7 +839,7 @@ export default {
         const senderId = callbackQuery.from.id.toString();
         const isAdmin = await checkIfAdmin(senderId);
         if (!isAdmin) {
-          await sendMessageToTopic(topicId, '只有管理员可以使用此功能。');
+          await sendMessageToTopic(topicId, '只有管理员可以使用此功能~');
           await sendAdminPanel(chatId, topicId, privateChatId, messageId);
           return;
         }
@@ -857,7 +856,7 @@ export default {
           await env.D1.prepare('INSERT OR REPLACE INTO user_states (chat_id, is_blocked) VALUES (?, ?)')
             .bind(privateChatId, true)
             .run();
-          await sendMessageToTopic(topicId, `用户 ${privateChatId} 已被拉黑，消息将不再转发。`);
+          await sendMessageToTopic(topicId, `用户 ${privateChatId} 已经进小黑屋啦~世界安静咯！`);
         } else if (action === 'unblock') {
           let state = userStateCache.get(privateChatId);
           if (state === undefined) {
@@ -871,25 +870,25 @@ export default {
           await env.D1.prepare('INSERT OR REPLACE INTO user_states (chat_id, is_blocked, is_first_verification) VALUES (?, ?, ?)')
             .bind(privateChatId, false, true)
             .run();
-          await sendMessageToTopic(topicId, `用户 ${privateChatId} 已解除拉黑，消息将继续转发。`);
+          await sendMessageToTopic(topicId, `用户 ${privateChatId} 被放出小黑屋啦！又可以看到TA的悄悄话咯~`);
         } else if (action === 'toggle_verification') {
           const currentState = (await getSetting('verification_enabled', env.D1)) === 'true';
           const newState = !currentState;
           await setSetting('verification_enabled', newState.toString());
-          await sendMessageToTopic(topicId, `验证码功能已${newState ? '开启' : '关闭'}。`);
+          await sendMessageToTopic(topicId, `验证码功能已${newState ? '开启' : '关闭'}`);
         } else if (action === 'check_blocklist') {
           const blockedUsers = await env.D1.prepare('SELECT chat_id FROM user_states WHERE is_blocked = ?')
             .bind(true)
             .all();
           const blockList = blockedUsers.results.length > 0 
             ? blockedUsers.results.map(row => row.chat_id).join('\n')
-            : '当前没有被拉黑的用户。';
+            : '当前没有被关小黑屋的笨蛋';
           await sendMessageToTopic(topicId, `黑名单列表：\n${blockList}`);
         } else if (action === 'toggle_user_raw') {
           const currentState = (await getSetting('user_raw_enabled', env.D1)) === 'true';
           const newState = !currentState;
           await setSetting('user_raw_enabled', newState.toString());
-          await sendMessageToTopic(topicId, `用户端 Raw 链接已${newState ? '开启' : '关闭'}。`);
+          await sendMessageToTopic(topicId, `用户端 Raw 链接已${newState ? '开启' : '关闭'}`);
         } else if (action === 'delete_user') {
           userStateCache.set(privateChatId, undefined);
           messageRateCache.set(privateChatId, undefined);
@@ -899,7 +898,7 @@ export default {
             env.D1.prepare('DELETE FROM message_rates WHERE chat_id = ?').bind(privateChatId),
             env.D1.prepare('DELETE FROM chat_topic_mappings WHERE chat_id = ?').bind(privateChatId)
           ]);
-          await sendMessageToTopic(topicId, `用户 ${privateChatId} 的状态、消息记录和话题映射已删除，用户需重新发起会话。`);
+          await sendMessageToTopic(topicId, `用户 ${privateChatId} 的状态、消息记录和话题映射已删除，用户需重新发起会话`);
         } else {
           await sendMessageToTopic(topicId, `未知操作：${action}`);
         }
